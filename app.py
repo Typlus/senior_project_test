@@ -3,10 +3,38 @@ import pandas as pd
 import math
 import functions 
 import reports
+from pathlib import Path
 st.title ("ImmersaVLM")
 # grab what species of animal they want to filter from the database
     # this can be done by have a running dictionary of them and pull from that
     # place for more filters to be added 
+    #Upload audio file
+uploaded_audio = st.file_uploader("Upload an audio file", type=["wav", "flac", "ogg", "m4a"])
+if uploaded_audio is not None:
+    st.audio(uploaded_audio)
+    st.success(f"Uploaded: {uploaded_audio.name}")
+
+# Inference controls below the upload box
+    inf_threshold = st.slider("Inference threshold (minimum confidence %)", min_value=0, max_value=100, value=20, step=5, format="%d%%")
+
+    # Model selection: list .pth files in models/ or fall back to project root model
+    models_dir = Path("models")
+    try:
+        model_files = sorted([p.name for p in models_dir.glob("*.pth")])
+    except Exception:
+        model_files = []
+
+    if not model_files:
+        # fallback to root model filename if present
+        if Path("best_supervised_model.pth").exists():
+            model_files = ["best_supervised_model.pth"]
+
+    if model_files:
+        model_choice = st.selectbox("Model to use:", options=model_files)
+    else:
+        model_choice = None
+        st.error("No model (.pth) found in models/ and no best_supervised_model.pth in project root.")
+
 user_selected_s = st.multiselect("species to filter by :",[ "Dolphin","Whale","Fish","Otter"])
 user_selected_c = st.slider ("what is minumum confidance level:", min_value=00, max_value=100 , value=0 , step=10, format="%d%%")
 
