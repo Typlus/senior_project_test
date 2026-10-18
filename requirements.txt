@@ -11,3 +11,5 @@ functions
  tempfile
  pathlib 
  google.api_core.exceptions 
+librosa
+tourch
